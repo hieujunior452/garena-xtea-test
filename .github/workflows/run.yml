@@ -8,21 +8,24 @@ jobs:
       - name: Install qemu + cross libs
         run: |
           sudo apt-get update
-          sudo apt-get install -y qemu-user-static libc6-dev-arm64-cross gcc-aarch64-linux-gnu
-          ls /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1
+          sudo apt-get install -y qemu-user-static libc6-dev-arm64-cross
       - name: Diagnostics
         run: |
           ls -la
-          file ./test_xtea
-          find / -name 'libm.so*' 2>/dev/null | head
-          find / -name 'libc.so*' 2>/dev/null | head
-      - name: Run test_xtea
+          file ./test_xtea2
+      - name: Encrypt captured plaintext (native)
         run: |
-          chmod +x ./test_xtea
+          chmod +x ./test_xtea2
           export LD_LIBRARY_PATH=/usr/aarch64-linux-gnu/lib:$PWD
-          qemu-aarch64-static -L /usr/aarch64-linux-gnu ./test_xtea 696d34834954176785e0c2ec851ac7135737acb497a92194c9982aeb4fb1e4f504a0436de95f8beeb2921edbde4061ce38840be47564f655aa56a29ae6e18ce1 47b1883bb3d334841dbb0873ed1a356c > output.txt 2>&1 || true
-          echo "=== OUTPUT ==="
-          cat output.txt
+          echo "native enc:"
+          qemu-aarch64-static -L /usr/aarch64-linux-gnu ./test_xtea2 enc 080010011a0862696b702e37343620802028b0a381800101939787a36953395004040404 47b1883bb3d334841dbb0873ed1a356c
+          echo "captured:"
+          echo "21ce028f04e7b6dc7979878da00c247d63fcfec74d332be96e3d43ec6a63fb050e09504052876da4"
+      - name: Decrypt captured ciphertext (native)
+        run: |
+          export LD_LIBRARY_PATH=/usr/aarch64-linux-gnu/lib:$PWD
+          echo "native dec:"
+          qemu-aarch64-static -L /usr/aarch64-linux-gnu ./test_xtea2 dec 21ce028f04e7b6dc7979878da00c247d63fcfec74d332be96e3d43ec6a63fb050e09504052876da4 47b1883bb3d334841dbb0873ed1a356c
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
