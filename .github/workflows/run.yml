@@ -14,8 +14,8 @@ jobs:
         run: |
           ls -la
           file ./test_xtea
-          qemu-aarch64-static --version | head -1
-          ldd ./test_xtea 2>/dev/null || true
+          find /usr/aarch64-linux-gnu -name 'ld-linux*' 2>/dev/null
+          find / -name 'ld-linux-aarch64.so*' 2>/dev/null | head
       - name: Run test_xtea
         run: |
           chmod +x ./test_xtea
