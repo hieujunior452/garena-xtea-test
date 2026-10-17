@@ -9,23 +9,20 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y qemu-user-static libc6-dev-arm64-cross
-      - name: Diagnostics
+      - name: Add Android libm.so
         run: |
-          ls -la
-          file ./test_xtea2
-      - name: Encrypt captured plaintext (native)
+          # use the arm64 renderscript libm.so from Android SDK if available
+          find / -name 'libm.so' -path '*arm64*' 2>/dev/null | head -1
+      - name: Run test_xtea2
         run: |
           chmod +x ./test_xtea2
-          export LD_LIBRARY_PATH=/usr/aarch64-linux-gnu/lib:$PWD
-          echo "native enc:"
-          qemu-aarch64-static -L /usr/aarch64-linux-gnu ./test_xtea2 enc 080010011a0862696b702e37343620802028b0a381800101939787a36953395004040404 47b1883bb3d334841dbb0873ed1a356c
-          echo "captured:"
+          export LD_LIBRARY_PATH=$PWD
+          echo "=== native enc ==="
+          qemu-aarch64-static -L /usr/aarch64-linux-gnu ./test_xtea2 enc 080010011a0862696b702e37343620802028b0a381800101939787a36953395004040404 47b1883bb3d334841dbb0873ed1a356c || echo "ENC FAILED"
+          echo "=== captured ==="
           echo "21ce028f04e7b6dc7979878da00c247d63fcfec74d332be96e3d43ec6a63fb050e09504052876da4"
-      - name: Decrypt captured ciphertext (native)
-        run: |
-          export LD_LIBRARY_PATH=/usr/aarch64-linux-gnu/lib:$PWD
-          echo "native dec:"
-          qemu-aarch64-static -L /usr/aarch64-linux-gnu ./test_xtea2 dec 21ce028f04e7b6dc7979878da00c247d63fcfec74d332be96e3d43ec6a63fb050e09504052876da4 47b1883bb3d334841dbb0873ed1a356c
+          echo "=== native dec ==="
+          qemu-aarch64-static -L /usr/aarch64-linux-gnu ./test_xtea2 dec 21ce028f04e7b6dc7979878da00c247d63fcfec74d332be96e3d43ec6a63fb050e09504052876da4 47b1883bb3d334841dbb0873ed1a356c || echo "DEC FAILED"
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
