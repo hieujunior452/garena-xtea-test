@@ -19,7 +19,7 @@ jobs:
       - name: Run test_xtea
         run: |
           chmod +x ./test_xtea
-          export LD_LIBRARY_PATH=$PWD
+          export LD_LIBRARY_PATH=/usr/aarch64-linux-gnu/lib:$PWD
           qemu-aarch64-static -L /usr/aarch64-linux-gnu ./test_xtea 696d34834954176785e0c2ec851ac7135737acb497a92194c9982aeb4fb1e4f504a0436de95f8beeb2921edbde4061ce38840be47564f655aa56a29ae6e18ce1 47b1883bb3d334841dbb0873ed1a356c > output.txt 2>&1 || true
           echo "=== OUTPUT ==="
           cat output.txt
