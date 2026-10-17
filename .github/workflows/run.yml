@@ -14,8 +14,8 @@ jobs:
         run: |
           ls -la
           file ./test_xtea
-          find /usr/aarch64-linux-gnu -name 'ld-linux*' 2>/dev/null
-          find / -name 'ld-linux-aarch64.so*' 2>/dev/null | head
+          find / -name 'libm.so*' 2>/dev/null | head
+          find / -name 'libc.so*' 2>/dev/null | head
       - name: Run test_xtea
         run: |
           chmod +x ./test_xtea
